@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+@theme {
+  --color-obsidian-900: #07090e;
+  --color-obsidian-800: #0b0f17;
+  --color-obsidian-700: #131924;
+  --color-obsidian-600: #1c2536;
+  --color-obsidian-500: #28344a;
+
+  --color-champagne-50: #fbf9f5;
+  --color-champagne-100: #f5f0e6;
+  --color-champagne-200: #ebdfc8;
+  --color-champagne-300: #dec7a3;
+  --color-champagne-400: #c5a880;
+  --color-champagne-500: #b49363;
+  --color-champagne-600: #9b7a4d;
+
+  --color-marble: #faf9f6;
+
+  --font-serif: 'Cinzel', 'Playfair Display', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', Inter, system-ui, sans-serif;
+}
+
+:root {
+  --brand-primary: #0b0f17;
+  --brand-accent: #c5a880;
+}
+
+body {
+  background-color: #080c14;
+  color: #f1f5f9;
+}
+
+/* Glassmorphism & Luxury Cards */
+.glass-panel {
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(197, 168, 128, 0.15);
+}
+
+.glass-panel-subtle {
+  background: rgba(11, 15, 23, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.glass-dropdown {
+  background: rgba(11, 15, 23, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(197, 168, 128, 0.2);
+}
+
+.gold-gradient-text {
+  background: linear-gradient(135deg, #f5f0e6 0%, #c5a880 50%, #9b7a4d 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gold-border {
+  border-color: rgba(197, 168, 128, 0.3);
+}
+
+/* Custom Luxury Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #080c14;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #28344a;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #c5a880;
+}
