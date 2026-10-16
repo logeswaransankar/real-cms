@@ -78,17 +78,17 @@ export const PropertyListingPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-obsidian-950 text-slate-100 pt-28 pb-20">
+    <div className="min-h-screen bg-[#faf9f6] text-[#1c1b1a] pt-28 pb-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Page Title Header */}
-        <div className="mb-8">
-          <span className="text-xs uppercase tracking-[0.25em] text-champagne-400 font-semibold block mb-2">
-            The Private Collection
+        <div className="mb-8 pb-4 border-b border-[#e7e4dc]">
+          <span className="text-[11px] uppercase tracking-[0.25em] text-[#997e55] font-semibold block mb-1">
+            Private Collection
           </span>
-          <h1 className="font-serif text-3xl sm:text-5xl font-medium text-white">
+          <h1 className="font-serif text-3xl sm:text-5xl font-normal text-[#1c1b1a]">
             Curated Luxury Residences
           </h1>
-          <p className="text-sm text-slate-400 mt-2 max-w-xl font-light">
+          <p className="text-xs sm:text-sm text-[#6e6962] mt-2 max-w-xl font-light">
             Explore world-renowned waterfront mansions, architectural penthouses, and prime off-plan residences.
           </p>
         </div>
@@ -101,10 +101,10 @@ export const PropertyListingPage: React.FC = () => {
         />
 
         {/* View Controls & Sorting Bar */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 pb-4 border-b border-white/5">
-          <div className="text-xs text-slate-400">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 pb-4 border-b border-[#e7e4dc]">
+          <div className="text-xs text-[#6e6962]">
             Showing{' '}
-            <span className="font-semibold text-white">
+            <span className="font-semibold text-[#1c1b1a]">
               {propertyData?.totalElements || 0}
             </span>{' '}
             verified residences
@@ -113,7 +113,7 @@ export const PropertyListingPage: React.FC = () => {
           <div className="flex items-center space-x-4 w-full sm:w-auto justify-between sm:justify-end">
             {/* Sorting Dropdown */}
             <div className="flex items-center space-x-2 text-xs">
-              <span className="text-slate-400">Sort by:</span>
+              <span className="text-[#8c8675]">Sort by:</span>
               <select
                 value={`${sortBy}_${sortDir}`}
                 onChange={(e) => {
@@ -122,7 +122,7 @@ export const PropertyListingPage: React.FC = () => {
                   setSortDir(dir);
                   setPage(0);
                 }}
-                className="bg-obsidian-900 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-champagne-400"
+                className="bg-white border border-[#e7e4dc] px-3 py-1.5 text-xs text-[#1c1b1a] focus:outline-none focus:border-[#1c1b1a]"
               >
                 <option value="createdAt_DESC">Newest Additions</option>
                 <option value="price_ASC">Price: Low to High</option>
@@ -132,14 +132,14 @@ export const PropertyListingPage: React.FC = () => {
             </div>
 
             {/* Grid vs List toggle */}
-            <div className="flex items-center p-1 rounded-lg bg-obsidian-900 border border-white/10">
+            <div className="flex items-center border border-[#e7e4dc] bg-white">
               <button
                 type="button"
                 onClick={() => setViewMode('grid')}
-                className={`p-1.5 rounded-md transition ${
+                className={`p-1.5 transition-colors ${
                   viewMode === 'grid'
-                    ? 'bg-champagne-400 text-obsidian-900'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-[#1c1b1a] text-white'
+                    : 'text-[#8c8675] hover:text-[#1c1b1a]'
                 }`}
                 title="Grid view"
               >
@@ -148,10 +148,10 @@ export const PropertyListingPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setViewMode('list')}
-                className={`p-1.5 rounded-md transition ${
+                className={`p-1.5 transition-colors ${
                   viewMode === 'list'
-                    ? 'bg-champagne-400 text-obsidian-900'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-[#1c1b1a] text-white'
+                    : 'text-[#8c8675] hover:text-[#1c1b1a]'
                 }`}
                 title="List view"
               >
@@ -161,80 +161,82 @@ export const PropertyListingPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Listings Display */}
+        {/* Content Section: Loading, Empty, or Property Cards */}
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-24 space-y-4">
-            <Loader2 className="w-8 h-8 text-champagne-400 animate-spin" />
-            <p className="text-xs uppercase tracking-widest text-slate-400">
-              Filtering Portfolio...
+          <div className="py-24 flex flex-col items-center justify-center space-y-3">
+            <Loader2 className="w-8 h-8 text-[#997e55] animate-spin" />
+            <p className="text-xs uppercase tracking-widest text-[#8c8675]">
+              Loading Verified Residences...
             </p>
           </div>
-        ) : propertyData?.content && propertyData.content.length > 0 ? (
-          <div
-            className={
-              viewMode === 'grid'
-                ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'
-                : 'space-y-6'
-            }
-          >
-            {propertyData.content.map((prop: Property) => (
-              <PropertyCard key={prop.id} property={prop} viewMode={viewMode} />
-            ))}
-          </div>
-        ) : (
-          <div className="glass-panel rounded-2xl p-16 text-center max-w-lg mx-auto space-y-4">
-            <AlertCircle className="w-10 h-10 text-champagne-400 mx-auto" />
-            <h3 className="font-serif text-xl font-medium text-white">
-              No matching residences found
+        ) : !propertyData?.content || propertyData.content.length === 0 ? (
+          <div className="border border-[#e7e4dc] bg-white p-12 text-center my-8 max-w-lg mx-auto space-y-4">
+            <AlertCircle className="w-8 h-8 text-[#997e55] mx-auto" />
+            <h3 className="font-serif text-xl font-normal text-[#1c1b1a]">
+              No Residences Match Your Parameters
             </h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              We couldn't find any properties matching your current criteria. Try expanding your price range or clearing specific filters.
+            <p className="text-xs text-[#6e6962] leading-relaxed">
+              We could not find properties matching your current filter selections. Try broadening your criteria or reset the search filters.
             </p>
             <button
               onClick={handleClearFilters}
-              className="px-6 py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider bg-champagne-400 text-obsidian-900 hover:bg-champagne-300 transition"
+              className="px-6 py-2.5 bg-[#1c1b1a] text-white text-xs uppercase tracking-wider font-semibold hover:bg-[#2e2b27] transition-colors"
             >
-              Reset All Filters
+              Reset Filters
             </button>
           </div>
-        )}
-
-        {/* Pagination Controls */}
-        {propertyData && propertyData.totalPages > 1 && (
-          <div className="mt-16 flex items-center justify-center space-x-3">
-            <button
-              disabled={page === 0}
-              onClick={() => setPage(page - 1)}
-              className="p-2.5 rounded-full glass-panel hover:border-champagne-400 disabled:opacity-40 disabled:cursor-not-allowed transition"
-              title="Previous Page"
+        ) : (
+          <div>
+            <div
+              className={
+                viewMode === 'grid'
+                  ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'
+                  : 'space-y-6'
+              }
             >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-
-            <div className="flex items-center space-x-1.5 text-xs font-medium">
-              {Array.from({ length: propertyData.totalPages }).map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setPage(idx)}
-                  className={`w-8 h-8 rounded-full transition flex items-center justify-center ${
-                    page === idx
-                      ? 'bg-champagne-400 text-obsidian-900 font-bold'
-                      : 'glass-panel text-slate-300 hover:text-white'
-                  }`}
-                >
-                  {idx + 1}
-                </button>
+              {propertyData.content.map((prop) => (
+                <PropertyCard key={prop.id} property={prop} viewMode={viewMode} />
               ))}
             </div>
 
-            <button
-              disabled={propertyData.last}
-              onClick={() => setPage(page + 1)}
-              className="p-2.5 rounded-full glass-panel hover:border-champagne-400 disabled:opacity-40 disabled:cursor-not-allowed transition"
-              title="Next Page"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
+            {/* Pagination Controls */}
+            {propertyData.totalPages > 1 && (
+              <div className="flex items-center justify-center space-x-2 mt-16 pt-8 border-t border-[#e7e4dc]">
+                <button
+                  disabled={page === 0}
+                  onClick={() => setPage((p) => Math.max(0, p - 1))}
+                  className="p-2 border border-[#e7e4dc] bg-white disabled:opacity-30 hover:border-[#1c1b1a] transition-colors"
+                  aria-label="Previous Page"
+                >
+                  <ChevronLeft className="w-4 h-4 text-[#1c1b1a]" />
+                </button>
+
+                <div className="flex items-center space-x-1 text-xs">
+                  {Array.from({ length: propertyData.totalPages }).map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setPage(idx)}
+                      className={`w-8 h-8 font-semibold transition-colors ${
+                        page === idx
+                          ? 'bg-[#1c1b1a] text-white'
+                          : 'border border-[#e7e4dc] bg-white text-[#5c5851] hover:border-[#1c1b1a]'
+                      }`}
+                    >
+                      {idx + 1}
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  disabled={page >= propertyData.totalPages - 1}
+                  onClick={() => setPage((p) => p + 1)}
+                  className="p-2 border border-[#e7e4dc] bg-white disabled:opacity-30 hover:border-[#1c1b1a] transition-colors"
+                  aria-label="Next Page"
+                >
+                  <ChevronRight className="w-4 h-4 text-[#1c1b1a]" />
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>

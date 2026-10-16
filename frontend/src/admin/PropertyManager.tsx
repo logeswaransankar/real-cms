@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
 import { Property, Location, Project, Amenity } from '../types';
+import { Property3DViewer } from '../components/3d/Property3DViewer';
 import {
   Building,
   Plus,
@@ -19,10 +20,12 @@ import {
   Tag,
   Star,
   ExternalLink,
+  Sparkles,
 } from 'lucide-react';
 
 export const PropertyManager: React.FC = () => {
   const [properties, setProperties] = useState<Property[]>([]);
+  const [preview3D, setPreview3D] = useState(false);
   const [locations, setLocations] = useState<Location[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [amenities, setAmenities] = useState<Amenity[]>([]);
@@ -58,8 +61,14 @@ export const PropertyManager: React.FC = () => {
     shortDescription: '',
     description: '',
     featuredImageUrl: '',
+    model3dEnabled: false,
     model3dUrl: '',
     model3dType: 'GLTF_GLB',
+    model3dTitle: '',
+    model3dCameraPreset: 'FRONT_ELEVATION',
+    model3dLightingPreset: 'GOLDEN_HOUR',
+    fallbackImageUrl: '',
+    tour360Url: '',
     virtualTourUrl: '',
     videoUrl: '',
     floorplanUrl: '',
@@ -132,8 +141,14 @@ export const PropertyManager: React.FC = () => {
       shortDescription: prop.shortDescription || '',
       description: prop.description || '',
       featuredImageUrl: prop.featuredImageUrl || '',
+      model3dEnabled: prop.model3dEnabled ?? false,
       model3dUrl: prop.model3dUrl || '',
       model3dType: prop.model3dType || 'GLTF_GLB',
+      model3dTitle: prop.model3dTitle || '',
+      model3dCameraPreset: prop.model3dCameraPreset || 'FRONT_ELEVATION',
+      model3dLightingPreset: prop.model3dLightingPreset || 'GOLDEN_HOUR',
+      fallbackImageUrl: prop.fallbackImageUrl || '',
+      tour360Url: prop.tour360Url || '',
       virtualTourUrl: prop.virtualTourUrl || '',
       videoUrl: prop.videoUrl || '',
       floorplanUrl: prop.floorplanUrl || '',
@@ -185,8 +200,14 @@ export const PropertyManager: React.FC = () => {
         shortDescription: form.shortDescription,
         description: form.description,
         featuredImageUrl: form.featuredImageUrl,
+        model3dEnabled: form.model3dEnabled,
         model3dUrl: form.model3dUrl,
         model3dType: form.model3dType,
+        model3dTitle: form.model3dTitle,
+        model3dCameraPreset: form.model3dCameraPreset,
+        model3dLightingPreset: form.model3dLightingPreset,
+        fallbackImageUrl: form.fallbackImageUrl,
+        tour360Url: form.tour360Url,
         virtualTourUrl: form.virtualTourUrl,
         videoUrl: form.videoUrl,
         floorplanUrl: form.floorplanUrl,
@@ -703,34 +724,155 @@ export const PropertyManager: React.FC = () => {
                     />
                   </div>
 
-                  <div className="bg-obsidian-950 p-4 rounded-xl border border-white/10 space-y-3">
-                    <div className="flex items-center gap-2 text-champagne-400 font-semibold text-xs">
-                      <Box className="w-4 h-4" />
-                      <span>Interactive 3D Spatial Experience (WebGL / Three.js)</span>
+                  <div className="bg-obsidian-950 p-4 rounded-xl border border-white/10 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-champagne-400 font-semibold text-xs">
+                        <Box className="w-4 h-4" />
+                        <span>Interactive 3D Spatial Experience (Three.js / WebGL)</span>
+                      </div>
+                      <label className="flex items-center space-x-2 cursor-pointer text-xs">
+                        <input
+                          type="checkbox"
+                          checked={form.model3dEnabled}
+                          onChange={(e) => setForm({ ...form, model3dEnabled: e.target.checked })}
+                          className="rounded border-white/20 text-champagne-400 focus:ring-champagne-400"
+                        />
+                        <span className="text-slate-300 font-medium">Enable 3D Viewer on Listing</span>
+                      </label>
                     </div>
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-[11px] text-slate-400 mb-1">3D Model URL (.glb / .gltf)</label>
+                        <div className="flex items-center justify-between mb-1">
+                          <label className="block text-[11px] text-slate-300 font-medium">3D Model URL (.glb / .gltf)</label>
+                          <div className="flex items-center space-x-1.5">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setForm({
+                                  ...form,
+                                  model3dUrl:
+                                    'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb',
+                                  model3dEnabled: true,
+                                })
+                              }
+                              className="text-[10px] text-champagne-400 hover:text-champagne-300 underline"
+                              title="Use Khronos official binary sample"
+                            >
+                              Khronos GLB
+                            </button>
+                            <span className="text-slate-600 text-[10px]">•</span>
+                            <button
+                              type="button"
+                              onClick={() => setForm({ ...form, model3dUrl: '', model3dEnabled: true })}
+                              className="text-[10px] text-slate-400 hover:text-white underline"
+                              title="Use built-in procedural pavilion model"
+                            >
+                              Procedural Pavilion
+                            </button>
+                          </div>
+                        </div>
                         <input
                           type="text"
                           value={form.model3dUrl}
                           onChange={(e) => setForm({ ...form, model3dUrl: e.target.value })}
                           className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-3 py-2 text-xs text-white"
-                          placeholder="https://raw.githubusercontent.com/.../model.glb"
+                          placeholder="https://.../model.glb (or leave empty for procedural pavilion)"
                         />
                       </div>
                       <div>
-                        <label className="block text-[11px] text-slate-400 mb-1">3D Engine Format</label>
-                        <select
-                          value={form.model3dType}
-                          onChange={(e) => setForm({ ...form, model3dType: e.target.value })}
+                        <label className="block text-[11px] text-slate-300 font-medium mb-1">3D Experience Title</label>
+                        <input
+                          type="text"
+                          value={form.model3dTitle}
+                          onChange={(e) => setForm({ ...form, model3dTitle: e.target.value })}
                           className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-3 py-2 text-xs text-white"
-                        >
-                          <option value="GLTF_GLB">GLTF / Binary GLB</option>
-                          <option value="PROCEDURAL">Procedural Three.js Fallback</option>
-                        </select>
+                          placeholder="e.g. Interactive Sky Villa 3D Walkthrough"
+                        />
                       </div>
                     </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-[11px] text-slate-300 font-medium mb-1">Camera Initial Preset</label>
+                        <select
+                          value={form.model3dCameraPreset}
+                          onChange={(e) => setForm({ ...form, model3dCameraPreset: e.target.value })}
+                          className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-3 py-2 text-xs text-white"
+                        >
+                          <option value="FRONT_ELEVATION">Front Elevation (Eye Level)</option>
+                          <option value="AERIAL_VIEW">Aerial Drone View (High Angle)</option>
+                          <option value="CORNER_PERSPECTIVE">Corner Perspective (3/4 View)</option>
+                          <option value="TERRACE_VIEW">Terrace Horizon View</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-[11px] text-slate-300 font-medium mb-1">Lighting Atmosphere Preset</label>
+                        <select
+                          value={form.model3dLightingPreset}
+                          onChange={(e) => setForm({ ...form, model3dLightingPreset: e.target.value })}
+                          className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-3 py-2 text-xs text-white"
+                        >
+                          <option value="GOLDEN_HOUR">Golden Hour (Sunset Luxury)</option>
+                          <option value="STUDIO">Studio Daylight (Clean Architectural)</option>
+                          <option value="OBSIDIAN_NIGHT">Obsidian Night (Glowing Twilight)</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-[11px] text-slate-300 font-medium mb-1">Fallback Image URL</label>
+                        <input
+                          type="text"
+                          value={form.fallbackImageUrl}
+                          onChange={(e) => setForm({ ...form, fallbackImageUrl: e.target.value })}
+                          className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-3 py-2 text-xs text-white"
+                          placeholder="https://... (High-res photo if 3D fails)"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="pt-2 border-t border-white/5 flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <label className="block text-[11px] text-slate-400 font-medium">360° Virtual Tour / Matterport URL:</label>
+                        <input
+                          type="text"
+                          value={form.tour360Url}
+                          onChange={(e) => setForm({ ...form, tour360Url: e.target.value })}
+                          className="bg-obsidian-900 border border-white/10 rounded-lg px-2.5 py-1 text-xs text-white w-72"
+                          placeholder="https://my.matterport.com/..."
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setPreview3D(!preview3D)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center space-x-1.5 ${
+                          preview3D
+                            ? 'bg-champagne-400 text-obsidian-950 shadow-glow-gold'
+                            : 'bg-white/10 text-slate-300 hover:text-white'
+                        }`}
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                        <span>{preview3D ? 'Hide 3D Preview' : 'Test Live 3D Preview'}</span>
+                      </button>
+                    </div>
+
+                    {/* Live 3D Test Viewer inside Admin Form */}
+                    {preview3D && (
+                      <div className="mt-3 border border-champagne-400/30 rounded-xl overflow-hidden">
+                        <div className="bg-obsidian-900 px-3 py-1.5 text-[11px] text-champagne-300 font-semibold border-b border-white/5 flex items-center justify-between">
+                          <span>Live CMS Interactive 3D Preview</span>
+                          <span className="text-[10px] text-slate-400 font-mono">Real-time Three.js Canvas</span>
+                        </div>
+                        <Property3DViewer
+                          modelUrl={form.model3dUrl}
+                          enabled={true}
+                          title={form.model3dTitle || form.title || '3D Preview'}
+                          fallbackImage={form.fallbackImageUrl || form.featuredImageUrl}
+                          cameraPreset={form.model3dCameraPreset}
+                          lightingPreset={form.model3dLightingPreset}
+                          tour360Url={form.tour360Url}
+                        />
+                      </div>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
